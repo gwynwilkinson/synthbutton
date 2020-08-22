@@ -22,14 +22,16 @@ Set up a file handle for /dev/input/eventx and read input_events from it, and th
 
 Figured out using https://thehackerdiary.wordpress.com/2017/04/21/exploring-devinput-1/ and https://github.com/freedesktop-unofficial-mirror/evtest/blob/master/evtest.c
 
-## Signal.h - https://man7.org/linux/man-pages/man2/sigaction.2.html
+## Signal.h
 Used to handle audio synchronisation and interrupt handling in our single-threaded program.
 
 We have two signal handlers - the first catches a realtime clock signal sent every 10ms (and prevents interruption during this), the second catches SIGINT so our input loop runs correctly.
 
 As we are not threading, we use a mask to block signals while in the clock handler (failing to do this breaks the wave sampling function). Currently a bit of a blunt object as we block ALL signals - not sure what correct practice on this is.
 
-## Time.h - https://man7.org/linux/man-pages/man2/clock_gettime.2.html
+Lots of tutorials on signal handling, man pages should be the starting point  - https://man7.org/linux/man-pages/man2/sigaction.2.html
+
+## Time.h
 Used for CLOCK_REALTIME, but it's not actually clear if this is worse than CLOCK_MONOTONIC. We need a clock signal to synchronise audio generation and this seems to be the closest thing possible.
 
 Basically, we achieve realtime control by writing an audio buffer whenever a clock signal is received, then generating the buffer contents ready for the next clock signal. This doesn't work perfectly (I suspect snd_pcm_writei and sample_wave currently are both accessing the buffer and this is affecting things).
@@ -37,6 +39,8 @@ Basically, we achieve realtime control by writing an audio buffer whenever a clo
 This way we can push our key and hear a sound without audible delay, giving the impression of real time responsiveness. (I read somewhere that 15ms is considered the upper latency limit for music software, which seems about right though I haven't tested this myself).
 
 There is a realtime linux kernel which should make things more deterministic but I haven't tried it, it seemed like a rabbit hole and I didn't want to risk it for this small project.
+
+Again man pages should be starting point eg. https://man7.org/linux/man-pages/man2/clock_gettime.2.html
 
 ## Ncurses.h
 Used to hide terminal key echos and provide a simple user interface (to be added). Underused in this code but it's really nice, you just get a blank terminal screen that you get full control of (no scrolling, key echos etc).
