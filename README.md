@@ -16,7 +16,7 @@ All audio problems currently are probably caused by errors in how timing and buf
 Credit to http://equalarea.com/paul/alsa-audio.html and https://www.alsa-project.org/alsa-doc/alsa-lib/_2test_2pcm_8c-example.html for giving me a starting point.
 
 ## Input.h
-Used to read keyboard events
+Used to read keyboard events so that we can use the keyboard to start/stop the synth generation & playback.
 
 Set up a file handle for /dev/input/eventx and read input_events from it, and that's it. Maybe libinput is better somehow (https://wayland.freedesktop.org/libinput/doc/latest/) but this, too, seems controversial.
 
